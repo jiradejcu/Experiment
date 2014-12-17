@@ -13,6 +13,7 @@ public class ButtonEvents : MonoBehaviour
 
 		public void OnClick (dfControl control, dfMouseEventArgs mouseEvent)
 		{
-				GameObject.Destroy (gameObject);
+				GameObject.Destroy (transform.root.gameObject);
+				Application.LoadLevel ("Main");
 		}
 }

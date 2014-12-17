@@ -3,6 +3,10 @@ using System.Collections;
 
 public class DebugDialog : MonoBehaviour
 {
+		void Start ()
+		{
+				GameObject.DontDestroyOnLoad (gameObject);
+		}
 
 		void OnGUI ()
 		{
@@ -12,6 +16,9 @@ public class DebugDialog : MonoBehaviour
 		void ClearAsset ()
 		{
 				if (GUI.Button (new Rect (10f, 10f, 100f, 50f), "Clear Asset")) {
+						dfAtlas atlas = GameObject.FindObjectOfType<dfAtlas> ();
+						if (atlas != null)
+								GameObject.DestroyImmediate (atlas.gameObject);
 						dfMaterialCache.Clear ();
 						Resources.UnloadUnusedAssets ();
 				}
