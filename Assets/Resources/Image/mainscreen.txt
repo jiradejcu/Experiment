@@ -1,0 +1,172 @@
+{"frames": {
+
+"N.png":
+{
+	"frame": {"x":1994,"y":244,"w":33,"h":34},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":33,"h":34},
+	"sourceSize": {"w":33,"h":34}
+},
+"character_new.png":
+{
+	"frame": {"x":1928,"y":114,"w":93,"h":83},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":83},
+	"sourceSize": {"w":93,"h":83}
+},
+"cloud-1.png":
+{
+	"frame": {"x":2,"y":1068,"w":166,"h":106},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":166,"h":106},
+	"sourceSize": {"w":166,"h":106}
+},
+"cloud-2.png":
+{
+	"frame": {"x":205,"y":962,"w":201,"h":126},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":126},
+	"sourceSize": {"w":201,"h":126}
+},
+"cloud-3.png":
+{
+	"frame": {"x":327,"y":770,"w":238,"h":35},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":238,"h":35},
+	"sourceSize": {"w":238,"h":35}
+},
+"cloud-4.png":
+{
+	"frame": {"x":2,"y":940,"w":201,"h":126},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":201,"h":126},
+	"sourceSize": {"w":201,"h":126}
+},
+"fusion-two-game.png":
+{
+	"frame": {"x":2,"y":536,"w":519,"h":232},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":519,"h":232},
+	"sourceSize": {"w":519,"h":232}
+},
+"invite-friend-btn.png":
+{
+	"frame": {"x":408,"y":962,"w":142,"h":117},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":142,"h":117},
+	"sourceSize": {"w":142,"h":117}
+},
+"jellery-nest-1.png":
+{
+	"frame": {"x":327,"y":807,"w":230,"h":153},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":230,"h":153},
+	"sourceSize": {"w":230,"h":153}
+},
+"main-bg1-2.png":
+{
+	"frame": {"x":2,"y":2,"w":640,"h":532},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":532},
+	"sourceSize": {"w":640,"h":532}
+},
+"main-bg2.png":
+{
+	"frame": {"x":644,"y":2,"w":640,"h":467},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":467},
+	"sourceSize": {"w":640,"h":467}
+},
+"main-bg3.png":
+{
+	"frame": {"x":1286,"y":302,"w":640,"h":293},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":293},
+	"sourceSize": {"w":640,"h":293}
+},
+"main-tree.png":
+{
+	"frame": {"x":644,"y":471,"w":639,"h":630},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":639,"h":630},
+	"sourceSize": {"w":639,"h":630}
+},
+"rainbow.png":
+{
+	"frame": {"x":2,"y":770,"w":323,"h":168},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":323,"h":168},
+	"sourceSize": {"w":323,"h":168}
+},
+"setting-btn.png":
+{
+	"frame": {"x":1928,"y":2,"w":116,"h":110},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":116,"h":110},
+	"sourceSize": {"w":116,"h":110}
+},
+"small-tree.png":
+{
+	"frame": {"x":1928,"y":199,"w":64,"h":129},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":129},
+	"sourceSize": {"w":64,"h":129}
+},
+"top-tree.png":
+{
+	"frame": {"x":1286,"y":2,"w":640,"h":298},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":298},
+	"sourceSize": {"w":640,"h":298}
+},
+"tree-fusion-1.png":
+{
+	"frame": {"x":2023,"y":114,"w":17,"h":70},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":17,"h":70},
+	"sourceSize": {"w":17,"h":70}
+},
+"tree-fusion-2.png":
+{
+	"frame": {"x":1994,"y":280,"w":31,"h":26},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":31,"h":26},
+	"sourceSize": {"w":31,"h":26}
+},
+"tree-fusion-3.png":
+{
+	"frame": {"x":1994,"y":199,"w":52,"h":43},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":52,"h":43},
+	"sourceSize": {"w":52,"h":43}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker ",
+	"version": "1.0",
+	"image": "mainscreen.png",
+	"format": "RGBA8888",
+	"size": {"w":2048,"h":2048},
+	"scale": "0.41667",
+	"smartupdate": "$TexturePacker:SmartUpdate:b16827a91495c23ed88d57ad9144d697:8490848c4320cf1fb0b07f19da4e3bba:42fb06e955dec14ed23767a95d0f2eb1$"
+}
+}
