@@ -20,7 +20,14 @@ public class DebugDialog : MonoBehaviour
 						if (atlas != null)
 								GameObject.DestroyImmediate (atlas.gameObject);
 						dfMaterialCache.Clear ();
-						Resources.UnloadUnusedAssets ();
+//						Resources.UnloadUnusedAssets ();
+						Texture2D[] textureList = Resources.FindObjectsOfTypeAll<Texture2D> ();
+						foreach (Texture2D tex in textureList) {
+								if (tex.name.Equals ("mainscreen")) {
+										Debug.Log ("found");
+										Resources.UnloadAsset (tex);
+								}
+						}
 				}
 		}
 
