@@ -54,11 +54,21 @@ internal class dfMaterialCache
 	public static void Clear()
 	{
 		Cache.ClearAll();
+		UnloadTexture();
 		caches.Clear();
 	}
 
+	private static void UnloadTexture(){
+		Material[] materialList = Resources.FindObjectsOfTypeAll<Material> ();
+		foreach (Material mat in materialList) {
+			if (caches.ContainsKey(mat)) {
+				Resources.UnloadAsset (mat.mainTexture);
+			}
+		}
+	}
+	
 	#endregion
-
+	
 	#region Nested classes
 
 	private class Cache
