@@ -1,0 +1,144 @@
+fileFormatVersion: 2
+guid: 7da127b79637645a4adf0bfde8ee2f1e
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Fruit_Back
+    21300002: orange_scene01
+    21300004: watermelon_scene01
+    21300006: apple_scene01
+    21300008: mango_scene01
+    21300010: apple_shadow
+    21300012: mango_shadow
+    21300014: orange_shadow
+    21300016: watermelon_shadow
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  seamlessCubemap: 0
+  textureFormat: 33
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 0
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 5
+  buildTargetSettings:
+  - buildTarget: iPhone
+    maxTextureSize: 2048
+    textureFormat: 33
+    compressionQuality: 50
+  - buildTarget: Android
+    maxTextureSize: 2048
+    textureFormat: 33
+    compressionQuality: 50
+  spriteSheet:
+    sprites:
+    - name: orange_scene01
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 1299
+        width: 447
+        height: 443
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: watermelon_scene01
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 1303
+        width: 407
+        height: 423
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: apple_scene01
+      rect:
+        serializedVersion: 2
+        x: 467
+        y: 555
+        width: 447
+        height: 431
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: mango_scene01
+      rect:
+        serializedVersion: 2
+        x: 1143
+        y: 531
+        width: 403
+        height: 415
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: apple_shadow
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 291
+        width: 407
+        height: 167
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: mango_shadow
+      rect:
+        serializedVersion: 2
+        x: 1171
+        y: 287
+        width: 387
+        height: 159
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: orange_shadow
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 1051
+        width: 431
+        height: 175
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: watermelon_shadow
+      rect:
+        serializedVersion: 2
+        x: 1119
+        y: 1071
+        width: 411
+        height: 167
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
