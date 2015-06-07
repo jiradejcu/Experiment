@@ -1,10 +1,11 @@
-﻿// Builds an asset bundle from the selected objects in the project view,
-// and changes the texture format using an AssetPostprocessor.
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using JSFTCacheManager = Jemast.LocalCache.CacheManager;
+using JSFTShared = Jemast.LocalCache.Shared;
+using JSFTPlatform = Jemast.LocalCache.Platform;
 
 public class ExportAssetBundles
 {
@@ -14,6 +15,8 @@ public class ExportAssetBundles
 		// Store current texture format for the TextureProcessor.
 		public static TextureImporterFormat textureFormat = TextureImporterFormat.PVRTC_RGBA4;
 		private static BuildTarget buildTarget;
+		private static Queue<string> buildQueue;
+		private static Dictionary<string, string> subtargetDictionary;
 
 		#region Unity menu integration
 	
@@ -21,12 +24,32 @@ public class ExportAssetBundles
 		[MenuItem("Tools/Build/Android/All")]
 		static void ExportAll_Android_Assets ()
 		{
+				subtargetDictionary = new Dictionary<string, string> ();
+				subtargetDictionary.Add (TextureImporterFormat.PVRTC_RGBA4.ToString (), JSFTShared.CacheSubtarget.Android_PVRTC.ToString ());
+				subtargetDictionary.Add (TextureImporterFormat.ATC_RGBA8.ToString (), JSFTShared.CacheSubtarget.Android_ATC.ToString ());
+				
 				multipleExport = true;
-				ExportAll_Android_SD_DXT5_Assets ();
-				ExportAll_Android_SD_PVRTC_RGBA4_Assets ();
-				ExportAll_Android_SD_ATC_RGBA8_Assets ();
-				ExportAll_Android_SD_ETC2_RGBA8_Assets ();
+				JSFTPlatform.PlatformChange = new JSFTPlatform.CallbackFunction (ExportSD_Asset);
+				buildQueue = new Queue<string> ();
+				buildQueue.Enqueue (TextureImporterFormat.PVRTC_RGBA4.ToString ());
+				buildQueue.Enqueue (TextureImporterFormat.ATC_RGBA8.ToString ());
+				ExportAll_Android_Assets_Queue ();
 				multipleExport = false;
+		}
+
+		static void ExportAll_Android_Assets_Queue ()
+		{
+				if (buildQueue.Count > 0) {
+						string target = buildQueue.Dequeue ();
+						if (target == TextureImporterFormat.PVRTC_RGBA4.ToString ()) {
+								ExportAll_Android_SD_PVRTC_RGBA4_Assets ();
+						} else if (target == TextureImporterFormat.ATC_RGBA8.ToString ()) {
+								ExportAll_Android_SD_ATC_RGBA8_Assets ();
+						}
+				
+						if (buildTarget.ToString () == JSFTCacheManager.CurrentCacheTarget.ToString () && subtargetDictionary [textureFormat.ToString ()] == JSFTCacheManager.CurrentCacheSubtarget.ToString ())
+								ExportSD_Asset ();
+				}
 		}
 
 		//Android SD
@@ -35,7 +58,7 @@ public class ExportAssetBundles
 		{
 				buildTarget = BuildTarget.Android;
 				textureFormat = TextureImporterFormat.DXT5;
-				ExportSD_Asset ();
+				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_DXT, true);
 		}
 
 		[MenuItem("Tools/Build/Android/SD/PVRTC_RGBA4")]
@@ -43,7 +66,7 @@ public class ExportAssetBundles
 		{
 				buildTarget = BuildTarget.Android;
 				textureFormat = TextureImporterFormat.PVRTC_RGBA4;
-				ExportSD_Asset ();
+				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_PVRTC, true);
 		}
 
 		[MenuItem("Tools/Build/Android/SD/ATC_RGBA8")]
@@ -51,7 +74,7 @@ public class ExportAssetBundles
 		{
 				buildTarget = BuildTarget.Android;
 				textureFormat = TextureImporterFormat.ATC_RGBA8;
-				ExportSD_Asset ();
+				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_ATC, true);
 		}
 
 		[MenuItem("Tools/Build/Android/SD/ETC2_RGBA8")]
@@ -59,7 +82,7 @@ public class ExportAssetBundles
 		{
 				buildTarget = BuildTarget.Android;
 				textureFormat = TextureImporterFormat.ETC2_RGBA8;
-				ExportSD_Asset ();
+				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_ETC2, true);
 		}
 
 		static void ExportSD_Asset ()
@@ -70,105 +93,13 @@ public class ExportAssetBundles
 				buildDirList.Add ("Assets/AssetBundles/Story/Scene02");
 
 				ExportAssetResources (buildDirList);
+				ExportAll_Android_Assets_Queue ();
 		}
 
 		#endregion
 
-		[MenuItem("Assets/Show Dependencies")]
-		static void ExportDependencies ()
-		{
-				ShowDependencies ();       
-		}
-
-		[MenuItem("Assets/Build DXT5")]
-		static void ExportDXT5 ()
-		{
-				buildTarget = EditorUserBuildSettings.activeBuildTarget;
-				textureFormat = TextureImporterFormat.DXT5;
-				ExportSelectResource ();    
-		}
-
-		[MenuItem("Assets/Build PVRTC_RGBA4")]
-		static void ExportPVRTC_RGBA4 ()
-		{
-				buildTarget = EditorUserBuildSettings.activeBuildTarget;
-				textureFormat = TextureImporterFormat.PVRTC_RGBA4;
-				ExportSelectResource ();       
-		}
-
-		[MenuItem("Assets/Build ATC_RGBA8")]
-		static void ExportATC_RGBA8 ()
-		{
-				buildTarget = EditorUserBuildSettings.activeBuildTarget;
-				textureFormat = TextureImporterFormat.ATC_RGBA8;
-				ExportSelectResource ();
-		}
-
-		[MenuItem("Assets/Build ETC2_RGBA8")]
-		static void ExportETC2_RGBA8 ()
-		{
-				buildTarget = EditorUserBuildSettings.activeBuildTarget;
-				textureFormat = TextureImporterFormat.ETC2_RGBA8;
-				ExportSelectResource ();
-		}
-
-		private static bool isSelectDependencies = true;
-
-		static void ExportResource ()
-		{
-				// Bring up save panel.
-				if (isSelectDependencies) {
-						savepath = EditorUtility.SaveFilePanel ("Save Resource", "", EditorUserBuildSettings.activeBuildTarget.ToString () + "_EN_HD", "unity3d");
-				} else {
-						savepath = EditorUtility.SaveFilePanel ("Save Resource", "", Selection.activeObject.ToString () + "_EN_HD", "unity3d");
-				}
-				
-				string path = savepath;	
-
-				string saveName = Path.GetFileNameWithoutExtension (path);
-				path = path.Replace (saveName, saveName + "_" + textureFormat);
-				Debug.Log ("ExportResource at path = " + path);
-
-				if (path.Length != 0) {
-						if (isSelectDependencies) {
-								Debug.Log ("build with dependency");
-								// Build the resource file from the active selection.
-								Object[] selection = Selection.GetFiltered (typeof(Object), SelectionMode.DeepAssets);
-			
-								int i = 0;
-								foreach (object asset in selection) {
-										EditorUtility.DisplayProgressBar ("Asset Bundle Process", "Processing asset : " + asset.ToString (), (float)++i / selection.Length);
-										string assetPath = AssetDatabase.GetAssetPath ((UnityEngine.Object)asset);
-										Debug.Log ("assetPath = " + assetPath);
-										if (asset is Texture2D) {
-												// Force reimport thru TextureProcessor.
-												AssetDatabase.ImportAsset (assetPath);
-												Debug.Log ("asset is Texture2D");
-										}
-								}
-
-								BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets, EditorUserBuildSettings.activeBuildTarget);				
-								Selection.objects = selection;
-						} else {
-								Debug.Log ("build with no-dependency");
-								BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets, EditorUserBuildSettings.activeBuildTarget);
-						}
-				}
-		}
-
-		static void ExportSelectResource ()
-		{
-				// Bring up save panel.
-				string selectpath = AssetDatabase.GetAssetPath (Selection.activeObject);
-		
-				string savepath = EditorUtility.SaveFilePanel ("Save Resource", "", "", "unity3d");
-
-				BuildAssetInDirectory (savepath, selectpath);
-		}
-
 		static void ExportAssetResources (List<string> buildDirList, bool isNeedCompression = true)
 		{
-				// Bring up save panel.
 				if (string.IsNullOrEmpty (savepath) || !multipleExport)
 						savepath = EditorUtility.SaveFilePanel ("Save Resource", "", "", "unity3d");
 
@@ -188,52 +119,21 @@ public class ExportAssetBundles
 						buildToPath = Path.GetDirectoryName (savepath) + "/" + buildToPath + "_" + buildTarget + Path.GetExtension (savepath);
 				}
 
-				Debug.Log ("buildToPath = " + buildToPath);
-
 				string[] fileEntries = Directory.GetFiles (buildDir, "*.*", SearchOption.AllDirectories);
-				Debug.Log ("fileEntries = " + fileEntries.Length);
 				string[] dependencies = AssetDatabase.GetDependencies (fileEntries);
-				Debug.Log ("dependencies at path length = " + dependencies.Length);
 
-				//need to build asset from here
-				ArrayList assetList = new ArrayList ();
+				List<Object> assetList = new List<Object> ();
 				int i = 0;
 
 				foreach (string filePath in dependencies) {
-						Debug.Log ("filename : " + filePath);
 						Object asset = AssetDatabase.LoadAssetAtPath (filePath, typeof(Object));
-
 						EditorUtility.DisplayProgressBar ("Asset Bundle Process", "Processing asset : " + asset.ToString (), (float)++i / dependencies.Length);
-						if (asset != null) {
-								Debug.Log (asset.name);
-								if (asset is Texture2D) {
-										// Force reimport thru TextureProcessor.
-										AssetDatabase.ImportAsset (filePath);
-										// Debug.Log ("asset is Texture2D");
-								}
-						}
 						assetList.Add (asset);
 				}
 				
-				Object[] assets = (Object[])assetList.ToArray (typeof(Object));
+				Object[] assets = assetList.ToArray ();
 				Selection.objects = assets;
 
 				BuildPipeline.BuildAssetBundle (Selection.activeObject, assets, buildToPath, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets, buildTarget);
-		}
-
-		static void ShowDependencies ()
-		{
-				Debug.Log ("build with dependency");
-				// Build the resource file from the active selection.
-				Object[] selection = Selection.GetFiltered (typeof(Object), SelectionMode.DeepAssets);
-				Selection.objects = EditorUtility.CollectDependencies (selection);
-
-				string assetList = "";
-
-				foreach (Object asset in Selection.objects) {
-						assetList += asset.name + "\n";
-				}
-
-				Debug.Log (assetList);
 		}
 }
