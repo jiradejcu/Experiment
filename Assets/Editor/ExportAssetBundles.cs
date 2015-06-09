@@ -95,6 +95,30 @@ public class ExportAssetBundles
 	
 		#region Unity menu integration
 	
+		[MenuItem("Tools/Build/Sound/iOS")]
+		static void ExportSound_IOS ()
+		{
+				savepath = "";
+				currentBuildTarget = BuildTarget.iPhone;
+		
+				List<string> buildDirList = new List<string> ();
+				buildDirList.Add ("Assets/AssetBundles/Sound");
+		
+				ExportAssetResources (buildDirList, false);
+		}
+	
+		[MenuItem("Tools/Build/Sound/Android")]
+		static void ExportSound_Android ()
+		{
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+		
+				List<string> buildDirList = new List<string> ();
+				buildDirList.Add ("Assets/AssetBundles/Sound");
+		
+				ExportAssetResources (buildDirList, false);
+		}
+
 		//Android All
 		[MenuItem("Tools/Build/iOS/All")]
 		static void ExportAll_iOS_Assets ()
