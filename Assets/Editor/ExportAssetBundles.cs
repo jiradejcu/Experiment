@@ -10,7 +10,6 @@ using JSFTPlatform = Jemast.LocalCache.Platform;
 [InitializeOnLoad]
 public class ExportAssetBundles
 {
-		// Store current texture format for the TextureProcessor.
 		public static TextureImporterFormat textureFormat = TextureImporterFormat.PVRTC_RGBA4;
 		private static BuildTarget buildTarget;
 		private static Dictionary<int, AndroidBuildSubtarget> androidSubtargetDictionary;
@@ -119,7 +118,6 @@ public class ExportAssetBundles
 				ExportAssetResources (buildDirList, false);
 		}
 
-		//Android All
 		[MenuItem("Tools/Build/iOS/All")]
 		static void ExportAll_iOS_Assets ()
 		{
@@ -131,7 +129,6 @@ public class ExportAssetBundles
 				Export_Assets_Queue ();
 		}
 
-		//Android All
 		[MenuItem("Tools/Build/Android/All")]
 		static void ExportAll_Android_Assets ()
 		{
@@ -167,8 +164,7 @@ public class ExportAssetBundles
 						}
 				}
 		}
-	
-		//Android SD
+
 		[MenuItem("Tools/Build/Android/SD/DXT5")]
 		static void ExportAll_Android_SD_DXT5_Assets ()
 		{
