@@ -300,6 +300,8 @@ namespace Jemast.LocalCache
 
             foreach (string path in assetPaths)
             {
+                if (Path.IsPathRooted(path)) continue;
+
                 AssetDatabase.WriteImportSettingsIfDirty(path);
 
                 AssetImporter assetImporter = AssetImporter.GetAtPath(path);
@@ -612,6 +614,8 @@ namespace Jemast.LocalCache
 
                 foreach (string path in assetPaths)
                 {
+                    if (Path.IsPathRooted(path)) continue;
+
                     EditorUtility.DisplayProgressBar("Hold on", "Reimporting changed assets...",
                         currentAsset/(float) assetCount);
 

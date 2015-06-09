@@ -1,9 +1,9 @@
 ------------------------------------------
 Fast Platform Switch
-v1.7
+v1.7.1
 Codename: JLocalCachePlugin
 Product Page: http://jemast.com/unity/fast-platform-switch/
-Copyright (c) 2013-2014 jemast software.
+Copyright (c) 2013-2015 jemast software.
 ------------------------------------------
 
 
@@ -44,6 +44,14 @@ Feel free to contact us at contact@jemast.com for personal support
 -------------------------------------------
 Release Notes
 -------------------------------------------
+
+-------------------
+v1.7.1 (02/12/2015)
+-------------------
+
+- ABOUT: When updating a project to Unity 5, it is recommended you clear all cache
+- FIX: Fixed hangs in Unity 5 happening randomly after switching due to eager UI refresh
+- FIX: Fixed trying to persist changes on files that are not project assets (no more warnings in Unity 5)
 
 -------------------
 v1.7 (11/09/2014)

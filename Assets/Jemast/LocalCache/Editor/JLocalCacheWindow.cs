@@ -237,7 +237,7 @@ public class JLocalCacheWindow : EditorWindow
 
         bool isDirty = false;
 
-        if (_buildTargetTextures == null || _areaStyle.normal.background == null)
+        if ((_buildTargetTextures == null || _areaStyle.normal.background == null) && !JSFTCacheManager.PlatformRefreshInProgress)
         {
             SetupWindow();
             isDirty = true;
@@ -246,6 +246,7 @@ public class JLocalCacheWindow : EditorWindow
         if (_buildTargetTextures == null || _buildTargetTextures.Length == 0)
         {
             ForceCleanup();
+            isDirty = true;
         }
         else
         {

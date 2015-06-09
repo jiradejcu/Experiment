@@ -16,7 +16,7 @@ namespace Jemast.LocalCache
 
         private static bool? _wantsSwitchOperation;
 
-		private static bool _shouldSkipFrame;
+		private static bool _hasSkippedFrame;
 
         static Platform()
         {
@@ -164,7 +164,7 @@ namespace Jemast.LocalCache
                 if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling ||
                     EditorApplication.isUpdating) return;
 
-				if (_shouldSkipFrame) {
+				if (_hasSkippedFrame) {
 	                try
 	                {
 	                    CacheManager.CheckHardLinkStatus();
@@ -177,9 +177,9 @@ namespace Jemast.LocalCache
 	                catch
 	                {
 	                }
-					_shouldSkipFrame = false;
+					_hasSkippedFrame = false;
 				} else {
-					_shouldSkipFrame = true;
+					_hasSkippedFrame = true;
 				}
             }
             else
@@ -189,18 +189,18 @@ namespace Jemast.LocalCache
                     if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling ||
                         EditorApplication.isUpdating) return;
 
-					if (_shouldSkipFrame) {
+					if (_hasSkippedFrame) {
 	                    try
-	                    {
+                        {
 	                        CacheManager.Cleanup();
 	                        CacheManager.ShouldPerformCleanup = false;
 	                    }
 	                    catch
 	                    {
 	                    }
-						_shouldSkipFrame = false;
+						_hasSkippedFrame = false;
 					} else {
-						_shouldSkipFrame = true;
+						_hasSkippedFrame = true;
 					}
                 }
                 else if (WantsSwitchOperation && WantedCacheTarget != null &&
@@ -216,11 +216,11 @@ namespace Jemast.LocalCache
                 else if (CacheManager.ShouldSerializeAssets && !EditorApplication.isPlayingOrWillChangePlaymode &&
                          !EditorApplication.isCompiling && !EditorApplication.isUpdating)
                 {
-					if (_shouldSkipFrame) {
+					if (_hasSkippedFrame) {
                         CacheManager.SerializeAssetsOperation();
-						_shouldSkipFrame = false;
+						_hasSkippedFrame = false;
 					} else {
-						_shouldSkipFrame = true;
+						_hasSkippedFrame = true;
 					}
                 }
                 else if (CacheManager.ShouldSwitchPlatform && !EditorApplication.isPlayingOrWillChangePlaymode &&
