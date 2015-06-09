@@ -7,84 +7,188 @@ using JSFTCacheManager = Jemast.LocalCache.CacheManager;
 using JSFTShared = Jemast.LocalCache.Shared;
 using JSFTPlatform = Jemast.LocalCache.Platform;
 
+[InitializeOnLoad]
 public class ExportAssetBundles
 {
-		public static string savepath = "";
-		private static bool multipleExport = false;
-
 		// Store current texture format for the TextureProcessor.
 		public static TextureImporterFormat textureFormat = TextureImporterFormat.PVRTC_RGBA4;
 		private static BuildTarget buildTarget;
-		private static Queue<string> buildQueue;
-		private static Dictionary<string, string> subtargetDictionary;
+		private static Dictionary<int, AndroidBuildSubtarget> androidSubtargetDictionary;
+		private static Dictionary<int, TextureImporterFormat> androidTextureImporterFormatDictionary;
+		public static Dictionary<AndroidBuildSubtarget, int> bundleVersionList = new Dictionary<AndroidBuildSubtarget, int> ();
+	
+		static ExportAssetBundles ()
+		{
+				JSFTPlatform.PlatformChange += ExportSD_Asset;
 
+				bundleVersionList [AndroidBuildSubtarget.ETC2] = 1;
+				bundleVersionList [AndroidBuildSubtarget.DXT] = 2;
+				bundleVersionList [AndroidBuildSubtarget.PVRTC] = 3;
+				bundleVersionList [AndroidBuildSubtarget.ATC] = 4;
+
+				androidSubtargetDictionary = new Dictionary<int, AndroidBuildSubtarget> ();
+				androidSubtargetDictionary.Add (bundleVersionList [AndroidBuildSubtarget.ETC2], AndroidBuildSubtarget.ETC2);
+				androidSubtargetDictionary.Add (bundleVersionList [AndroidBuildSubtarget.DXT], AndroidBuildSubtarget.DXT);
+				androidSubtargetDictionary.Add (bundleVersionList [AndroidBuildSubtarget.PVRTC], AndroidBuildSubtarget.PVRTC);
+				androidSubtargetDictionary.Add (bundleVersionList [AndroidBuildSubtarget.ATC], AndroidBuildSubtarget.ATC);
+
+				androidTextureImporterFormatDictionary = new Dictionary<int, TextureImporterFormat> ();
+				androidTextureImporterFormatDictionary.Add (bundleVersionList [AndroidBuildSubtarget.ETC2], TextureImporterFormat.ETC2_RGBA8);
+				androidTextureImporterFormatDictionary.Add (bundleVersionList [AndroidBuildSubtarget.DXT], TextureImporterFormat.DXT5);
+				androidTextureImporterFormatDictionary.Add (bundleVersionList [AndroidBuildSubtarget.PVRTC], TextureImporterFormat.PVRTC_RGBA4);
+				androidTextureImporterFormatDictionary.Add (bundleVersionList [AndroidBuildSubtarget.ATC], TextureImporterFormat.ATC_RGBA8);
+		}
+
+		static string savepath {
+				get {
+						return EditorPrefs.HasKey ("savepath") ? EditorPrefs.GetString ("savepath") : "";
+				}
+				set {
+						EditorPrefs.SetString ("savepath", value);
+				}
+		}
+	
+		static bool buildAllSubtarget {
+				get {
+						return EditorPrefs.HasKey ("buildAllSubtarget") ? EditorPrefs.GetBool ("buildAllSubtarget") : false;
+				}
+				set {
+						EditorPrefs.SetBool ("buildAllSubtarget", value);
+				}
+		}
+	
+		static BuildTarget? currentBuildTarget {
+				get {
+						return EditorPrefs.HasKey ("currentBuildTarget") ? (BuildTarget?)EditorPrefs.GetInt ("currentBuildTarget") : null;
+				}
+				set {
+						if (value == null)
+								EditorPrefs.DeleteKey ("currentBuildTarget");
+						else
+								EditorPrefs.SetInt ("currentBuildTarget", (int)value);
+				}
+		}
+	
+		static AndroidBuildSubtarget? currentBuildSubTarget {
+				get {
+						return EditorPrefs.HasKey ("currentBuildSubTarget") ? (AndroidBuildSubtarget?)EditorPrefs.GetInt ("currentBuildSubTarget") : null;
+				}
+				set {
+						if (value == null)
+								EditorPrefs.DeleteKey ("currentBuildSubTarget");
+						else
+								EditorPrefs.SetInt ("currentBuildSubTarget", (int)value);
+				}
+		}
+	
+		static AndroidBuildSubtarget? nextBuildSubTarget {
+				get {
+						return EditorPrefs.HasKey ("nextBuildSubTarget") ? (AndroidBuildSubtarget?)EditorPrefs.GetInt ("nextBuildSubTarget") : null;
+				}
+				set {
+						if (value == null)
+								EditorPrefs.DeleteKey ("nextBuildSubTarget");
+						else
+								EditorPrefs.SetInt ("nextBuildSubTarget", (int)value);
+				}
+		}
+	
 		#region Unity menu integration
 	
+		//Android All
+		[MenuItem("Tools/Build/iOS/All")]
+		static void ExportAll_iOS_Assets ()
+		{
+				savepath = "";
+				currentBuildTarget = BuildTarget.iPhone;
+				nextBuildSubTarget = AndroidBuildSubtarget.PVRTC;
+		
+				Export_Assets_Queue ();
+		}
+
 		//Android All
 		[MenuItem("Tools/Build/Android/All")]
 		static void ExportAll_Android_Assets ()
 		{
-				subtargetDictionary = new Dictionary<string, string> ();
-				subtargetDictionary.Add (TextureImporterFormat.PVRTC_RGBA4.ToString (), JSFTShared.CacheSubtarget.Android_PVRTC.ToString ());
-				subtargetDictionary.Add (TextureImporterFormat.ATC_RGBA8.ToString (), JSFTShared.CacheSubtarget.Android_ATC.ToString ());
-				
-				multipleExport = true;
-				JSFTPlatform.PlatformChange = new JSFTPlatform.CallbackFunction (ExportSD_Asset);
-				buildQueue = new Queue<string> ();
-				buildQueue.Enqueue (TextureImporterFormat.PVRTC_RGBA4.ToString ());
-				buildQueue.Enqueue (TextureImporterFormat.ATC_RGBA8.ToString ());
-				ExportAll_Android_Assets_Queue ();
-				multipleExport = false;
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+				nextBuildSubTarget = AndroidBuildSubtarget.ETC2;
+				buildAllSubtarget = true;
+
+				Export_Assets_Queue ();
 		}
 
-		static void ExportAll_Android_Assets_Queue ()
+		static void Export_Assets_Queue ()
 		{
-				if (buildQueue.Count > 0) {
-						string target = buildQueue.Dequeue ();
-						if (target == TextureImporterFormat.PVRTC_RGBA4.ToString ()) {
-								ExportAll_Android_SD_PVRTC_RGBA4_Assets ();
-						} else if (target == TextureImporterFormat.ATC_RGBA8.ToString ()) {
-								ExportAll_Android_SD_ATC_RGBA8_Assets ();
-						}
+				if (currentBuildTarget.HasValue && nextBuildSubTarget.HasValue) {
+						currentBuildSubTarget = nextBuildSubTarget;
+
+						if (currentBuildTarget.Equals (BuildTarget.Android)) {
+								if (buildAllSubtarget && androidSubtargetDictionary.ContainsKey (bundleVersionList [currentBuildSubTarget.Value] + 1))
+										nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [currentBuildSubTarget.Value] + 1];
+								else
+										nextBuildSubTarget = null;
+			                                                       
+								JSFTPlatform.SwitchPlatform (JSFTShared.CacheTargetForBuildTarget (currentBuildTarget).Value, JSFTShared.CacheSubtargetForAndroidBuildSubtarget (currentBuildSubTarget).Value);
+
+								if (EditorUserBuildSettings.activeBuildTarget.Equals (currentBuildTarget) && EditorUserBuildSettings.androidBuildSubtarget.Equals (currentBuildSubTarget)) {
+										ExportSD_Asset ();
+								}
+						} else {
+								JSFTPlatform.SwitchPlatform (JSFTShared.CacheTargetForBuildTarget (currentBuildTarget).Value);
 				
-						if (buildTarget.ToString () == JSFTCacheManager.CurrentCacheTarget.ToString () && subtargetDictionary [textureFormat.ToString ()] == JSFTCacheManager.CurrentCacheSubtarget.ToString ())
-								ExportSD_Asset ();
+								if (EditorUserBuildSettings.activeBuildTarget.Equals (currentBuildTarget)) {
+										ExportSD_Asset ();
+								}
+						}
 				}
 		}
-
+	
 		//Android SD
 		[MenuItem("Tools/Build/Android/SD/DXT5")]
 		static void ExportAll_Android_SD_DXT5_Assets ()
 		{
-				buildTarget = BuildTarget.Android;
-				textureFormat = TextureImporterFormat.DXT5;
-				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_DXT, true);
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+				nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [AndroidBuildSubtarget.DXT]];
+				buildAllSubtarget = false;
+		
+				Export_Assets_Queue ();
 		}
-
+	
 		[MenuItem("Tools/Build/Android/SD/PVRTC_RGBA4")]
 		static void ExportAll_Android_SD_PVRTC_RGBA4_Assets ()
 		{
-				buildTarget = BuildTarget.Android;
-				textureFormat = TextureImporterFormat.PVRTC_RGBA4;
-				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_PVRTC, true);
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+				nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [AndroidBuildSubtarget.PVRTC]];
+				buildAllSubtarget = false;
+		
+				Export_Assets_Queue ();
 		}
-
+	
 		[MenuItem("Tools/Build/Android/SD/ATC_RGBA8")]
 		static void ExportAll_Android_SD_ATC_RGBA8_Assets ()
 		{
-				buildTarget = BuildTarget.Android;
-				textureFormat = TextureImporterFormat.ATC_RGBA8;
-				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_ATC, true);
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+				nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [AndroidBuildSubtarget.ATC]];
+				buildAllSubtarget = false;
+		
+				Export_Assets_Queue ();
 		}
-
+	
 		[MenuItem("Tools/Build/Android/SD/ETC2_RGBA8")]
 		static void ExportAll_Android_SD_ETC2_RGBA8_Assets ()
 		{
-				buildTarget = BuildTarget.Android;
-				textureFormat = TextureImporterFormat.ETC2_RGBA8;
-				JSFTCacheManager.SwitchPlatform (JSFTShared.CacheTarget.Android, JSFTShared.CacheSubtarget.Android_ETC2, true);
+				savepath = "";
+				currentBuildTarget = BuildTarget.Android;
+				nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [AndroidBuildSubtarget.ETC2]];
+				buildAllSubtarget = false;
+		
+				Export_Assets_Queue ();
 		}
-
+	
 		static void ExportSD_Asset ()
 		{
 				List<string> buildDirList = new List<string> ();
@@ -93,14 +197,18 @@ public class ExportAssetBundles
 				buildDirList.Add ("Assets/AssetBundles/Story/Scene02");
 
 				ExportAssetResources (buildDirList);
-				ExportAll_Android_Assets_Queue ();
+				Export_Assets_Queue ();
 		}
 
 		#endregion
 
 		static void ExportAssetResources (List<string> buildDirList, bool isNeedCompression = true)
 		{
-				if (string.IsNullOrEmpty (savepath) || !multipleExport)
+				buildTarget = currentBuildTarget.Value;
+				if (currentBuildSubTarget.HasValue)
+						textureFormat = androidTextureImporterFormatDictionary [bundleVersionList [currentBuildSubTarget.Value]];
+
+				if (string.IsNullOrEmpty (savepath))
 						savepath = EditorUtility.SaveFilePanel ("Save Resource", "", "", "unity3d");
 
 				foreach (string buildDir in buildDirList) {
