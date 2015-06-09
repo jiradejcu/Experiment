@@ -102,6 +102,7 @@ public class ExportAssetBundles
 				savepath = "";
 				currentBuildTarget = BuildTarget.iPhone;
 				nextBuildSubTarget = AndroidBuildSubtarget.PVRTC;
+				buildAllSubtarget = false;
 		
 				Export_Assets_Queue ();
 		}
@@ -122,12 +123,11 @@ public class ExportAssetBundles
 		{
 				if (currentBuildTarget.HasValue && nextBuildSubTarget.HasValue) {
 						currentBuildSubTarget = nextBuildSubTarget;
+						nextBuildSubTarget = null;
 
 						if (currentBuildTarget.Equals (BuildTarget.Android)) {
 								if (buildAllSubtarget && androidSubtargetDictionary.ContainsKey (bundleVersionList [currentBuildSubTarget.Value] + 1))
 										nextBuildSubTarget = androidSubtargetDictionary [bundleVersionList [currentBuildSubTarget.Value] + 1];
-								else
-										nextBuildSubTarget = null;
 			                                                       
 								JSFTPlatform.SwitchPlatform (JSFTShared.CacheTargetForBuildTarget (currentBuildTarget).Value, JSFTShared.CacheSubtargetForAndroidBuildSubtarget (currentBuildSubTarget).Value);
 
